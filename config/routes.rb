@@ -1,4 +1,8 @@
 Todo::Application.routes.draw do
+  get '/tasks/new', :controller => :tasks, :action => :new, :as => "new_task"
+  get '/tasks', :controller => :tasks, :action => :index, :as => "tasks"
+  post '/tasks', :controller => :tasks, :action => :create
+  get '/tasks/:id', :controller => :tasks, :action => :show, :as => "task"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

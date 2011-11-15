@@ -1,0 +1,6 @@
+<%= form_tag(tasks_path, :method => "post", :id => 'new_task' ) do %>
+  <%= label_tag(:task_name, 'Name') %>
+  <%= text_field_tag('task[name]') # task[name] => params = { :task => {:name => … }}
+  %>
+  <%= submit_tag("Create Task") %>
+<% end %>
