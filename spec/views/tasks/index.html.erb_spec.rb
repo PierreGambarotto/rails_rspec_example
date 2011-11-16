@@ -23,4 +23,11 @@ describe "tasks/index.html.erb" do
     rendered.should have_link("Create a new Task", :href => new_task_path)
   end
 
+  it "should display each task in the list with a delete link" do
+    @tasks.each do |task|
+      rendered.should have_selector("li#task_#{task.id} a", :text => "Delete this Task")
+    end
+  end
+
+
 end

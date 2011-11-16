@@ -11,4 +11,9 @@ class TasksController < ApplicationController
     redirect_to tasks_path
   end
 
+  def show
+  end
+
+  def destroy
+  end
 end

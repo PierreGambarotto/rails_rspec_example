@@ -141,9 +141,9 @@ Mon test d'intégration passe, je commite !
 
 ## Description du scénario :
 
-Étant donné que 3 tâches existent dans la base
-Si je visite le lien /tasks (i.e. `tasks_path`)
-Alors je dois voir le nom des 3 tâches 
+* Étant donné que 3 tâches existent dans la base
+* Si je visite le lien /tasks (i.e. `tasks_path`)
+* Alors je dois voir le nom des 3 tâches 
 
     rails g integration_test ListTasks
 
@@ -267,8 +267,8 @@ On va compléter le test d'intégration en rajoutant un jeu d'exemple qui corres
 1. visiter la page affichant la liste des tâches
 2. cliquer sur le lien
 3. remplir le formulaire sur la nouvelle page
-4. se retrouver sur la page affichant la liste, et voir la liste créée
-   s'affichier
+4. se retrouver sur la page affichant la liste, et voir la liste créée s'afficher
+
 
       describe "after a new task has been created" do
         before(:each) do
@@ -333,3 +333,91 @@ La spécification de l'action `create` du contrôleur devient alors :
 
 1. créer un nouvel objet Task à partir des paramètres.
 2. rediriger le client vers la liste des tâches `tasks_path`.
+
+Voir le code et l'implémentation pour la syntaxe.
+Le test d'intégration passe, scénario fini, on commite.
+
+# Effacer une tâche
+
+On veut implémenter le scénario suivant :
+
+1. Pour chaque tâche de la liste, il doit s'afficher un lien pour
+   la supprimer.
+2. Si on clique sur un de ces liens, on se retrouve de nouveau sur la liste
+   des tâches, mais la tâche a disparu.
+
+    rails g integration_test DeleteTask
+
+On rajoute d'abord l'affchage du lien.
+
+## Affichage du lien delete
+
+Test d'intégration :
+
+    describe "DeleteTasks" do
+      before(:each) do
+        @tasks = [Task.create(:name => 'task1', :done => false),
+                  Task.create(:name => 'task2', :done => true),
+                  Task.create(:name => 'task3', :done => false)]
+        visit tasks_path
+      end
+
+      describe "a task in the list" do
+        it "should have a delete button" do
+          visit tasks_path
+          @tasks.each{|task| page.should have_link("li a", :href => task_path, :method => 'delete')}
+        end
+    end
+
+Remarque : on aurait pu rajouter l'exemple dans le test d'intégration sur la
+liste, mais il vaut mieux regrouper les exemples concernant une même
+fonctionnalité dans un seul fichier.
+
+Il faut ensuite modifier la spécification du template `app/views/tasks/index.html.erb`
+
+Autre remarque : le chemin (path) pour désigner une ressource à la mode REST est
+le même pour l'action DELETE (effacer la ressource) et GET (récupérer une
+représentation de la resource). Pour une tâche dans notre application, c'est
+`/tasks/:id`.
+
+Nous allons rajouter les routes pour ces 2 actions :
+
+      get '/tasks/:id', :controller => :tasks, :action => :show, :as => "task" 
+      delete '/tasks/:id', :controller => :tasks, :action => :destroy 
+
+Juste après, on rajoute une implémentation vide pour les 2 actions dans le
+contrôleur.
+
+Après cela, on spécifie le lien pour le template et on le code.
+
+Spécification (extrait) :
+
+    it "should display each task in the list with a delete link" do
+      @tasks.each do |task|
+        rendered.should have_selector("li#task_#{task.id} a", :text => "Delete this Task")
+      end
+    end
+
+Code (extrait) : 
+
+    <li id='task_<%= task.id %>'><%= task.name %><%= link_to "Delete this Task", task, :method => 'delete'%></li>
+
+Remarque : un navigateur web ne sait de base que générer que des requêtes de type
+GET (click sur un lien) ou POST(validation de formulaire). 
+
+Rails fournit avec ces helpers pour les liens et les formulaires un codage du
+type de requête par l'intermédiaire d'un attribut pour les liens ou d'un
+paramètre supplémentaire pour les formulaires.
+
+Dans les helpers, il s'agit de rajouter : `:method => 'delete'|'put'|'post'|'get'`
+
+Vous en avez un exemple ici. Reportez vous encore au 
+[guide rails](http://guides.rubyonrails.org/form_helpers.html#how-do-forms-with-put-or-delete-methods-work) 
+pour des précisions supplémentaires.
+
+Et maintenant, passons à la suite du scénario, à savoir le click sur un lien et
+ses conséquences. Mais pas avant un petit commit quand même.
+
+## Détruire une tâche en cliquant sur le lien delete
+
+

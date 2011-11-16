@@ -2,7 +2,7 @@
 
 <ul id='tasks'>
   <% @tasks.each do |task| %>
-    <li id='task_<%= task.id %>'><%= task.name %></li>
+    <li id='task_<%= task.id %>'><%= task.name %><%= link_to "Delete this Task", task, :method => 'delete'%></li>
   <% end %>
 </ul>
 
