@@ -216,3 +216,48 @@ Là encore, le code est trivial.
 On vérifie que le test d'intégration passe, et on conclut notre 2e scénario en
 commitant le tout.
 
+# Compléter la démo
+
+On peut créer des tâches, et les lister, sur 2 vues différentes.
+Pour pouvoir manipuler complètement l'application sans rentrer d'url
+manuellement dans le navigateur, je vais rajouter :
+
+1. Une nouvelle route qui associe le chemin `/` à `Task#index`
+2. Un lien dans la vue liste qui permette de lancer la création de la liste.
+
+On rajoute 2 au test d'intégration `ListTasks`, puis à la spécification de la
+vue et à la vue. À noter que pour 1, on ne peut le spécifier dans un test
+d'intégration, qui suppose déjà fixé la partie routage.
+
+Il est possible de spécifier le routage avec rspec, voir
+[routing-specs](https://www.relishapp.com/rspec/rspec-rails/docs/routing-specs).
+Je me contente de rajouter la route directement dans `config/routes.rb`:
+
+    root :to => 'tasks#index'
+
+Voir [le guide sur le routage](http://guides.rubyonrails.org/routing.html#using-root)
+
+Il faut également détruire le fichier `public/index.html` qui sinon est utilisé
+pour la route `/`.
+
+Avec ces modification, il est possible de faire tourner notre application. Le
+problème restant est l'action `create` a été laissé blanche, ce qui fait que
+l'on ne crée pas grand chose.
+
+On peut utiliser la console de rails pour créer quelques tâches manuellement
+dans la base de l'environnement de développement, ce qui nous permettra de
+visualiser notre liste.
+
+    rails console
+    >> 3.times{|i| Task.create(:name => "Task #{i}")}
+    >> exit
+
+Pour lancer l'application :
+
+    rails server
+
+Il suffit alors de pointer son navigateur sur `http://localhost:3000`, et la
+liste de nos 3 tâches s'affiche. Si la page d'acceuil de Rails s'affiche, c'est
+que vous n'avez pas détruit `public/index.html`.
+
+

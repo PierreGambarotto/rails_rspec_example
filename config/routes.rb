@@ -1,4 +1,5 @@
 Todo::Application.routes.draw do
+  root :to => 'tasks#index'
   get '/tasks/new', :controller => :tasks, :action => :new, :as => "new_task"
   get '/tasks', :controller => :tasks, :action => :index, :as => "tasks"
   post '/tasks', :controller => :tasks, :action => :create

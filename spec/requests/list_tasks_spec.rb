@@ -9,9 +9,15 @@ describe "ListTasks" do
     visit tasks_path
   end
     
-  describe "GET /list_tasks" do
+  describe "GET /tasks" do
     it "should display each task name" do
       @tasks.each{|t| page.should have_content t.name}
     end
+
+    it "should display a link to create a new task" do
+      page.should have_link("Create a new Task", :href => new_task_path)
+    end
   end
+
+
 end

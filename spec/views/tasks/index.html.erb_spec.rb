@@ -19,4 +19,8 @@ describe "tasks/index.html.erb" do
     end
   end
 
+  it "should display a link to create a new task" do
+    rendered.should have_link("Create a new Task", :href => new_task_path)
+  end
+
 end
