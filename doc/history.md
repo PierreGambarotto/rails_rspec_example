@@ -211,4 +211,6 @@ remplace donc l'appel de `all` sur `Task` (stub).
 
 Là encore, le code est trivial.
 
+On vérifie que le test d'intégration passe, et on conclut notre 2e scénario en
+commitant le tout.
 
