@@ -365,7 +365,7 @@ Test d'intégration :
       describe "a task in the list" do
         it "should have a delete button" do
           visit tasks_path
-          @tasks.each{|task| page.should have_link("li a", :href => task_path, :method => 'delete')}
+          @tasks.each{|task| page.should have_link("Delete this Task", :href => task_path(task), :method => 'delete')}
         end
     end
 
@@ -420,4 +420,74 @@ ses conséquences. Mais pas avant un petit commit quand même.
 
 ## Détruire une tâche en cliquant sur le lien delete
 
+Test d'intégration :
 
+    describe "after a click on the delete link on the 2nd task" do
+      it "should display the list without the task2" do
+        within("li", :text => @task.name) do
+          click_on "Delete this Task"
+        end
+        page.should_not have_content(@task.name)
+      end
+    end
+
+On rajoute la redirection vers `tasks_path` dans le code de l'action `destroy`
+en la spécifiant au préalable :
+
+spécification :
+
+    describe "DELETE destroy" do
+      it "should redirect to the tasks list" do
+        delete :destroy, {:id => 4 }
+        response.should redirect_to tasks_path
+      end
+    end
+
+Remarque : il faut spécifier ici un id en paramètre, car le chemin dans la route définie est
+`/tasks/:id`. Si vous ne le faites pas, vous aurez une erreur au niveau routage,
+du type :
+
+     Failure/Error: delete :destroy
+     ActionController::RoutingError:
+       No route matches {:controller=>"tasks", :action=>"destroy"}
+
+La seule erreur restante dans le test d'intégration est du maintenant au fait
+que l'on efface pas la tâche :
+
+    rspec spec/requests/delete_tasks_spec.rb 
+    .F
+
+    Failures:
+
+      1) DeleteTasks after a click on the delete link on the 2nd task should display the list without the task2
+         Failure/Error: page.should_not have_content(@task.name)
+           expected content "task2" not to return anything
+
+Reste à faire le boulôt au niveau du contrôleur
+ 
+La spécification complète de l'action :
+
+    describe "DELETE destroy" do
+      before(:each) do
+        @task = stub_model(Task, :id => 4)
+        @task.stub(:destroy){ true }
+        Task.stub(:find){@task}
+      end
+      it "should redirect to the tasks list" do
+        delete :destroy, {:id => @task.id }
+        response.should redirect_to tasks_path
+      end
+
+      it "should search the task" do
+        Task.should_receive(:find).with(@task.id.to_s).and_return(@task)
+        delete :destroy, {:id => @task.id }
+      end
+
+      it "should destroy the task" do
+        @task.should_receive(:destroy)
+        delete :destroy, {:id => @task.id }
+      end
+
+    end
+
+Le test d'intégration ne signale plus d'erreur, tout est bon. Commit !

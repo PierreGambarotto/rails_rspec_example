@@ -40,4 +40,27 @@ describe TasksController do
       response.should redirect_to tasks_path
     end
   end
+
+  describe "DELETE destroy" do
+    before(:each) do
+      @task = stub_model(Task, :id => 4)
+      @task.stub(:destroy){ true }
+      Task.stub(:find){@task}
+    end
+    it "should redirect to the tasks list" do
+      delete :destroy, {:id => @task.id }
+      response.should redirect_to tasks_path
+    end
+
+    it "should search the task" do
+      Task.should_receive(:find).with(@task.id.to_s).and_return(@task)
+      delete :destroy, {:id => @task.id }
+    end
+
+    it "should destroy the task" do
+      @task.should_receive(:destroy)
+      delete :destroy, {:id => @task.id }
+    end
+
+  end
 end
