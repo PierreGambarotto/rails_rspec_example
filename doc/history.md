@@ -62,6 +62,8 @@ définir.
 Les erreurs restantes portent sur le contenu, il est temps de faire un peu de
 code !
 
+## Spécification de la vue
+
 Le premier jeu d'exemple porte sur l'affichage du formulaire.
 Nous allons décrire complètement le formulaire, en spécifiant pour le template
 `spec/views/tasks/new.html.erb_spec.rb` les éléments suivants :
@@ -127,3 +129,86 @@ Le code :
         redirect_to tasks_path
       end
     end
+
+Mon test d'intégration passe, je commite !
+
+    git add .
+    git commit -m "CreateTask scenario"
+
+# 2e scénario : affichage de la liste des tâches
+
+## Description du scénario :
+
+Étant donné que 3 tâches existent dans la base
+Si je visite le lien /tasks (i.e. `tasks_path`)
+Alors je dois voir le nom des 3 tâches 
+
+    rails g integration_test ListTasks
+
+Et on traduit en code la description ci-dessus.
+
+Il faut introduire le modèle pour pouvoir créer la précondition du scénario :
+
+    rails g model Task name:string done:boolean
+
+Le générateur crée la migration, il faut migrer la base de données de test et
+celle de développement :
+
+    RAILS_ENV=test rake db:migrate
+    rake db:migrate # mode de développement par défaut
+
+Le test d'intégration doit alors tourner correctement, et signaler :
+
+    rspec spec/requests/list_tasks_spec.rb 
+    F
+
+    Failures:
+
+      1) ListTasks GET /list_tasks should display each task name
+         Failure/Error: @tasks.each{|t| page.should have_content t.name}
+           expected there to be content "task1" in "Todo\n\nTasks#index\nFind me in app/views/tasks/index.html.erb\n\n\n"
+
+## Spécification de la vue
+
+Nous allons maintenant spécifier la vue. La spécification de la vue doit
+introduire le balisage HTML qui va être utilisé dans le template. Il faut
+normalement partir d'une représenation envisagé (tracée sur une feuille de
+papier par exemple).
+
+Ici, nous avons une liste d'éléments relativement simples à afficher, une liste
+HTML sera suffisante. (`<ul>` Unnumbered List). On la repère dans la page avec
+l'id `tasks`
+
+Donc en supposant que le contrôleur nous passe 3 objets Task dans la variable
+`@tasks`, je veux afficer trois fois le tag `<li>` (List Item) avec le nom de la
+liste à l'intérieur. Chaque li est identifié avec un dérivé de l'identifiant base de données
+de la tâche.
+
+Par exemple, la tâche d'id (base de donnée) 4 est identifé par l'id (HTML)
+`task_4`
+
+Cette spécification décrite sous forme de code est à voir dans
+`spec/views/tasks/index.html.erb_spec.rb`
+
+À noter que pour éviter de faire appel à la couche modèle, on utilise
+`stub_model` fourni par rspec-rails, c.f. 
+[la documentation](https://www.relishapp.com/rspec/rspec-rails/docs/mocks/stub-model)
+pour plus de détails.
+
+L'implémentation de la vue est ensuite triviale.
+
+## Spécification du contrôleur
+
+Reste l'action `index` du contrôleur à spécifier.
+
+Dans `index`, le contrôleur doit :
+
+1. récupérer les tâches en faisant appel à `Task.all`
+2. affecter la liste des tâches à la variable `@tasks`
+
+Pour le 2e example, il faut savoir quel est le résultat de `Task.all`, on
+remplace donc l'appel de `all` sur `Task` (stub).
+
+Là encore, le code est trivial.
+
+
