@@ -1,5 +1,6 @@
-rails new todo --skip-test-unit --skip-bundle
-cd todo
+# Création du projet
+    rails new todo --skip-test-unit --skip-bundle
+    cd todo
 
 # édition du Gemfile
 
@@ -21,9 +22,10 @@ ajout de
     require 'capybara/rspec'
 
 # Commit initial
-git init . 
-git add . 
-git commit -m "initial commit"
+
+    git init . 
+    git add . 
+    git commit -m "initial commit"
 
 #Première fonctionnalité : création d'une tâche
 
