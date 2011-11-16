@@ -260,4 +260,61 @@ Il suffit alors de pointer son navigateur sur `http://localhost:3000`, et la
 liste de nos 3 tâches s'affiche. Si la page d'acceuil de Rails s'affiche, c'est
 que vous n'avez pas détruit `public/index.html`.
 
+# Finir la création de liste
 
+On va compléter le test d'intégration en rajoutant un jeu d'exemple qui correspondra au scénario complet de la création d'une liste: 
+
+1. visiter la page affichant la liste des tâches
+2. cliquer sur le lien
+3. remplir le formulaire sur la nouvelle page
+4. se retrouver sur la page affichant la liste, et voir la liste créée
+   s'affichier
+
+      describe "after a new task has been created" do
+        before(:each) do
+          visit tasks_path
+          click_link("Create a new Task")
+          current_path.should == new_task_path
+          fill_in("Name", :with => "task 1")
+          click_button("Create Task")
+          current_path.should == tasks_path
+        end
+
+        it "should display the new task in the list" do
+          page.should have_content("task 1")
+        end
+      end
+
+Ce scénario récapitule les 2 précédents, et teste juste le résultat.
+En jouant le test, on obtient :
+
+    rspec spec/requests/create_tasks_spec.rb 
+    ....F
+
+    Failures:
+
+      1) CreateTasks after a new task has been created should display the new task in the list
+         Failure/Error: page.should have_content("task 1")
+           expected there to be content "task 1" in "Todo\n\nTasks#index\n\nCreate a new Task\n\n\n"
+
+On va maintenant spécifier au contrôleur de faire son travail.
+
+Pour cela, commençons par regarder le format des paramètres renvoyés par le
+formulaire dans la vue `app/views/tasks/new.html.erb`.
+
+Pour savoir le format exact renvoyè, on peut par exemple :
+
+* dans le contrôleur: enlever la redirection présenter vers `tasks_path`.  On
+rajoute `render :text => params.inspect` pour que le rendu de l'action soit le
+contenu des paramètres.
+* démarrer l'application en mode développement avec `rails server`, et créer une
+nouvelle tâche.
+
+Le rendu est alors le contenu de params :
+
+    {"utf8"=>"✓", "authenticity_token"=>"QpnPVk2BYEcDxqdACX+3Vg3u0Dv+hlPTygHA5TLGV+4=", "task"=>{"name"=>"task_name"}, "commit"=>"Create Task", "controller"=>"tasks", "action"=>"create"}
+
+En particulier, on voit que `params["task"]` contient la description des
+éléments pour créer la nouvelle tâche.
+
+Je commite ici pour que vous puissiez voir l'état des fichiers.
