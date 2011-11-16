@@ -24,4 +24,20 @@ describe TasksController do
       assigns(:tasks).should == @tasks
     end
   end
+
+  describe "POST create" do
+    before(:each) do
+      @new_task_params = {"task" => {"name" => "task_name"}}
+      Task.stub(:create) {true }
+    end
+    it "should create a new Task with the given params" do
+      Task.should_receive(:create).with(@new_task_params["task"])
+      post :create, @new_task_params
+    end
+
+    it "should redirect to tasks_path" do
+      post :create, @new_task_params
+      response.should redirect_to tasks_path
+    end
+  end
 end

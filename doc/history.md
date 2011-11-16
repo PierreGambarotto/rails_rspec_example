@@ -318,3 +318,18 @@ En particulier, on voit que `params["task"]` contient la description des
 éléments pour créer la nouvelle tâche.
 
 Je commite ici pour que vous puissiez voir l'état des fichiers.
+
+On peut embrayer sur l'écriture de la spécification du contrôleur.
+
+Dans la spécification, pour simuler la requête HTTP avec les paramètres
+corrects, on va écrire :
+
+    post :create, {"task" => {"name" => "task_name"}}
+
+Le 2e argument représente les paramètres reçus, i.e. la valeur dans le code de
+l'action de `params`. 
+
+La spécification de l'action `create` du contrôleur devient alors :
+
+1. créer un nouvel objet Task à partir des paramètres.
+2. rediriger le client vers la liste des tâches `tasks_path`.

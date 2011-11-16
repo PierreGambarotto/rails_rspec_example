@@ -7,8 +7,8 @@ class TasksController < ApplicationController
   end
 
   def create
-#    redirect_to tasks_path
-    render :text => params.inspect
+    Task.create(params[:task])
+    redirect_to tasks_path
   end
 
 end
